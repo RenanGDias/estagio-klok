@@ -74,7 +74,48 @@ A aplicação estará disponível em `http://localhost:8080`.
 Processa uma lista de pedidos e aplica as regras de negócio.
 
 **Exemplo de corpo da requisição:**
-Veja o arquivo [`pedido-exemplo.json`](./pedido-exemplo.json)
+
+```
+[
+  {
+    "cliente": {
+      "nome": "Maria",
+      "email": "maria@exemplo.com",
+      "vip": true
+    },
+    "items": [
+      {
+        "nome": "Produto A",
+        "preco": 50.0,
+        "quantidade": 2,
+        "estoque": 5
+      },
+      {
+        "nome": "Produto B",
+        "preco": 30.0,
+        "quantidade": 1,
+        "estoque": 10
+      }
+    ]
+  },
+  {
+    "cliente": {
+      "nome": "João",
+      "email": "joao@exemplo.com",
+      "vip": false
+    },
+    "items": [
+      {
+        "nome": "Produto C",
+        "preco": 20.0,
+        "quantidade": 3,
+        "estoque": 2
+      }
+    ]
+  }
+]
+
+```
 
 **Curl:**
 
