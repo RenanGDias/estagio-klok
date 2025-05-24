@@ -1,132 +1,179 @@
-# 📦 Klok Pedido - Desafio Técnico
+# Sistema de Pedidos - Desafio Estágio Klok
 
-Esta é a entrega do projeto desenvolvido para o desafio técnico da empresa **Klok**, com o objetivo de refatorar e otimizar o serviço de pedidos, melhorando sua legibilidade, manutenção e eficiência.
+Este projeto é uma solução para o desafio técnico proposto pela **Klok**, que consiste em refatorar e otimizar um serviço de pedidos com foco em clareza, legibilidade, manutenção e testes.
 
----
+## 📌 Objetivo
 
-## ✅ Objetivo
-
-Refatorar a classe `PedidoService`, mantendo a lógica de negócio clara, bem organizada e com testes unitários cobrindo os principais fluxos.
+Refatorar a lógica de negócios do serviço `PedidoService`, separando responsabilidades e garantindo maior organização, reutilização e testabilidade, utilizando **Spring Boot**.
 
 ---
 
-## 🧰 Tecnologias utilizadas
+## 🚀 Tecnologias Utilizadas
 
 - Java 17+
-- Spring Boot
-- Maven
+- Spring Boot 3
+- Spring Data JPA
+- H2 Database
 - JUnit 5
 - Mockito
-- VS Code / IntelliJ IDEA
+- Maven
 
 ---
 
-## 🗂️ Estrutura do projeto
+## ⚙️ Funcionalidades
+
+- Criação de pedidos com cliente e itens associados
+- Cálculo de total e total com desconto para clientes VIP
+- Verificação de disponibilidade em estoque
+- Definição de data de entrega
+- Envio de notificação (simulado via terminal)
+- Testes unitários cobrindo os cenários principais
+
+---
+
+## 🧱 Estrutura do Projeto
 
 ```
 src/
-├── main/
-│   └── java/br/com/klok/pedidos/
-│       ├── controller/            # Controllers REST
-│       ├── dto/                   # DTOs (Data Transfer Objects)
-│       ├── model/                 # Modelos: Pedido, Item, Cliente
-│       ├── service/               # Lógica principal (PedidoService)
-│       │   └── helper/            # Serviços auxiliares: estoque, total, notificação
-│       └── KlokPedidoApplication  # Main Spring Boot
-│
+├── controller/
+│   └── PedidoController.java
+├── dto/
+│   ├── request/
+│   └── response/
+├── mapper/
+│   ├── PedidoMapper.java
+│   ├── ClienteMapper.java
+│   └── ItemMapper.java
+├── model/
+│   ├── Pedido.java
+│   ├── Cliente.java
+│   ├── Item.java
+│   └── ItemPedido.java
+├── repository/
+│   ├── ClienteRepository.java
+│   ├── ItemRepository.java
+│   └── PedidoRepository.java
+├── service/
+│   ├── PedidoService.java
+│   ├── ItemService.java
+│   └── helper/
+│       ├── EstoqueService.java
+│       ├── NotificacaoService.java
+│       └── TotalService.java
 ├── test/
-│   └── java/br/com/klok/pedidos/
-│       └── PedidoServiceTest      # Testes unitários com Mockito
+│    └── PedidoServiceTest.java
+└── KlokPedidoApplication
 ```
 
 ---
 
-## 🚀 Como rodar o projeto
+## 📩 Endpoints
 
-1. Clone o repositório:
+### Criar Pedido
 
-```bash
-git clone https://github.com/seu-usuario/klok-pedidos.git
-cd klok-pedidos
+```http
+POST http://localhost:8080/pedidos/criar
 ```
 
-2. Compile o projeto:
+#### Exemplo de Request Body
 
-```bash
-./mvnw clean install
+```json
+{
+  "clienteId": 1,
+  "data": "2025-05-23",
+  "itens": [
+    {
+      "itemId": 1,
+      "quantidade": 3
+    }
+  ]
+}
 ```
 
-3. Rode a aplicação:
+### Listar Pedidos
 
-```bash
-./mvnw spring-boot:run
+```http
+GET http://localhost:8080/pedidos/listar
 ```
 
-A aplicação estará disponível em `http://localhost:8080`.
+### Buscar Pedido
+
+```http
+GET http://localhost:8080/pedidos/{id}
+```
+
+### Deletar Pedido
+
+```http
+DELETE http://localhost:8080/pedidos/{id}
+```
+
+### Criar Item
+
+```http
+POST http://localhost:8080/itens
+```
+
+#### Exemplo de Request Body
+
+```json
+{
+  "nome": "Camiseta",
+  "preco": 59.90,
+  "estoque": 10
+}
+
+```
+
+### Buscar Item
+
+```http
+GET http://localhost:8080/api/itens/{id}
+```
+
+### Criar Cliente
+
+```http
+POST http://localhost:8080/api/clientes
+```
+
+#### Exemplo de Request Body
+
+```json
+{
+  "nome": "João da Silva",
+  "email": "joao@exemplo.com",
+  "vip": true
+}
+
+```
+
+### Buscar Cliente
+
+```http
+GET /api/pedidos/criar
+```
+
+📌 **Nota:** A notificação ao cliente é exibida no terminal da aplicação, conforme exigido no desafio. Exemplo de saída:
+
+```
+Enviando e-mail para joao@exemplo.com: Seu pedido será entregue em breve.
+```
+
+📌 **Nota:** Nunca crie o pedido antes de ter criado o cliente e o item anteriormente!
 
 ---
 
-## 📬 Endpoint disponível
+## 🧪 Testes
 
-### POST `/api/pedidos`
+Os testes de unidade estão implementados para o `PedidoService`, utilizando **JUnit** e **Mockito**, validando os seguintes casos:
 
-Processa uma lista de pedidos e aplica as regras de negócio.
+- Pedido de cliente VIP com itens em estoque
+- Pedido de cliente VIP com itens fora de estoque
+- Pedido de cliente não-VIP
+- Múltiplos pedidos com diferentes condições
 
-**Exemplo de corpo da requisição:**
-
-```
-[
-  {
-    "cliente": {
-      "nome": "Maria",
-      "email": "maria@exemplo.com",
-      "vip": true
-    },
-    "itens": [
-      {
-        "nome": "Produto A",
-        "preco": 50.0,
-        "quantidade": 2,
-        "estoque": 5
-      },
-      {
-        "nome": "Produto B",
-        "preco": 30.0,
-        "quantidade": 1,
-        "estoque": 10
-      }
-    ]
-  },
-  {
-    "cliente": {
-      "nome": "João",
-      "email": "joao@exemplo.com",
-      "vip": false
-    },
-    "itens": [
-      {
-        "nome": "Produto C",
-        "preco": 20.0,
-        "quantidade": 3,
-        "estoque": 2
-      }
-    ]
-  }
-]
-
-```
-
-**Curl:**
-
-```bash
-curl -X POST http://localhost:8080/api/pedidos \
-  -H "Content-Type: application/json" \
-  -d @pedido-exemplo.json
-```
-
----
-
-## 🧪 Rodar os testes
+Para rodar os testes:
 
 ```bash
 ./mvnw test
@@ -134,71 +181,48 @@ curl -X POST http://localhost:8080/api/pedidos \
 
 ---
 
-## Código fonte original em java
+## 📂 Como rodar o projeto
 
-```
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/RenanGDias/estagio-klok
+   cd nome-do-repo
+   ```
 
-public class PedidoService {
+2. Execute o projeto com o Spring Boot:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-    public void processarPedidos(List<Pedido> pedidos) {
-        for (Pedido pedido : pedidos) {
-            double total = 0;
-
-            for (Item item : pedido.getItens()) {
-                total += item.getPreco() * item.getQuantidade();
-            }
-
-            pedido.setTotal(total);
-
-            if (pedido.getCliente().isVip()) {
-                total *= 0.9;
-            }
-
-            pedido.setTotalComDesconto(total);
-
-            boolean emEstoque = true;
-            for (Item item : pedido.getItens()) {
-                if (item.getQuantidade() > item.getEstoque()) {
-                    emEstoque = false;
-                    break;
-                }
-            }
-            pedido.setEmEstoque(emEstoque);
-
-            if (emEstoque) {
-                pedido.setDataEntrega(LocalDate.now().plusDays(3));
-            } else {
-                pedido.setDataEntrega(null);
-            }
-
-            if (emEstoque) {
-                enviarNotificacao(pedido.getCliente().getEmail(), "Seu pedido será entregue em breve.");
-            } else {
-                enviarNotificacao(pedido.getCliente().getEmail(), "Um ou mais itens do seu pedido estão fora de estoque.");
-            }
-        }
-    }
-
-    private void enviarNotificacao(String email, String mensagem) {
-        System.out.println("Enviando e-mail para " + email + ": " + mensagem);
-    }
-}
-
-
-```
-
-## 🧠 Regras de negócio implementadas
-
-- Cálculo do total do pedido com base em itens.
-- Aplicação de desconto para clientes VIP.
-- Verificação de estoque.
-- Definição da data de entrega com base na disponibilidade.
-- Envio de notificação por e-mail (simulado via `System.out`).
+3. Acesse o Postman ou outro cliente e execute os endpoints! Aproveite!
+   
 
 ---
 
-## 📬 Contato
+## ✅ Requisitos atendidos
 
-Desenvolvido por [Renan Gondim Dias de Albuquerque] — [renangdias18@gmail.com]
+- [x] Serviço de pedidos refatorado com boas práticas
+- [x] Testes unitários implementados
+- [x] Projeto disponibilizado em repositório Git
+- [x] Mensagem de notificação exibida no terminal
+- [x] Utilização de Spring Boot
 
 ---
+
+## 🏫 OBSERVAÇÃO IMPORTANTE!
+
+- Eu tenho muito orgulho de dizer que me especializei na área de desenvolvimento Java com Spring Boot + Java Persistency API + Bancos de Dados (H2-Console/PostgreSQL/MySQL) e hoje pude demonstrar minha capacidade de desenvolver um sistema completo desta forma! Mas não para por aí: desenvolvi também um curso completo de modo a apresentar um pouco mais do meu portfólio, minha trajetória e minhas conquistas! Você pode acessá-lo clicando no link abaixo (OBS: Caso note o design no nome de LucasGabriel, saiba que solicitei o Canva Pro dele para desenvolver este minicurso, mas é de autoria completa minha!):
+
+[Minicurso Introdução ao Java Spring Boot](https://www.canva.com/design/DAGkEDuDoaI/x0xoQT1upXphpTM9ugbAcQ/edit?utm_content=DAGkEDuDoaI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
+https://www.canva.com/design/DAGj4R1LfHo/nPQd6y3gI2r9ZcgSdlPrBg/edit?utm_content=DAGj4R1LfHo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
+https://www.canva.com/design/DAGkLssY18A/_NVSDXoFCETmaUbOZJXKtQ/edit?utm_content=DAGkLssY18A&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
+---
+
+## 📧 Contato
+
+Desenvolvido por **Renan Gondim Dias de Albuquerque**  
+📫 Email: [renangdias18@gmail.com](mailto:renangdias18@gmail.com)  
+💼 LinkedIn: [www.linkedin.com/in/renan-albuquerque-38661a284](https://www.linkedin.com/in/renan-albuquerque-38661a284)
