@@ -6,7 +6,7 @@ import java.util.List;
 public class PedidoResponseDTO {
     private Long id;
     private ClienteResponseDTO cliente;
-    private List<ItemResponseDTO> itens;
+    private List<ItemPedidoResponseDTO> itens;
     private double total;
     private double totalComDesconto;
     private boolean emEstoque;
@@ -24,10 +24,10 @@ public class PedidoResponseDTO {
     public void setCliente(ClienteResponseDTO cliente) {
         this.cliente = cliente;
     }
-    public List<ItemResponseDTO> getItens() {
+    public List<ItemPedidoResponseDTO> getItens() {
         return itens;
     }
-    public void setItens(List<ItemResponseDTO> itens) {
+    public void setItens(List<ItemPedidoResponseDTO> itens) {
         this.itens = itens;
     }
     public double getTotal() {

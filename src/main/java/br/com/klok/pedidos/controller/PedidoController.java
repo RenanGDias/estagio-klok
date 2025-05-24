@@ -1,5 +1,7 @@
 package br.com.klok.pedidos.controller;
 
+import br.com.klok.pedidos.dto.request.PedidoRequestDTO;
+import br.com.klok.pedidos.dto.response.PedidoResponseDTO;
 import br.com.klok.pedidos.model.Pedido;
 import br.com.klok.pedidos.service.PedidoService;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +19,20 @@ public class PedidoController {
         this.pedidoService = pedidoService;
     }
 
-    @PostMapping
-    public ResponseEntity<String> processarPedidos(@RequestBody List<Pedido> pedidos) {
-        pedidoService.processarPedidos(pedidos);
-        return ResponseEntity.ok("Pedidos processados e notificações enviadas com sucesso.");
-    }
-
     @PostMapping("/criar")
-    public ResponseEntity<Pedido> criarPedido(@RequestBody Pedido pedido) {
-        Pedido pedidoSalvo = pedidoService.salvarPedido(pedido);
-        return ResponseEntity.ok(pedidoSalvo);
+    public ResponseEntity<PedidoResponseDTO> criarPedido(@RequestBody PedidoRequestDTO pedidoDto) {
+        PedidoResponseDTO response = pedidoService.salvarPedido(pedidoDto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Pedido>> listarPedidos() {
+    public ResponseEntity<List<PedidoResponseDTO>> listarPedidos() {
         return ResponseEntity.ok(pedidoService.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pedido> buscarPorId(@PathVariable Long id) {
-        Pedido pedido = pedidoService.buscarPorId(id);
+    public ResponseEntity<PedidoResponseDTO> buscarPorId(@PathVariable Long id) {
+        PedidoResponseDTO pedido = pedidoService.buscarPorId(id);
         return pedido != null ? ResponseEntity.ok(pedido) : ResponseEntity.notFound().build();
     }
 
@@ -46,4 +42,3 @@ public class PedidoController {
         return ResponseEntity.noContent().build();
     }
 }
-

@@ -1,14 +1,17 @@
 package br.com.klok.pedidos.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import br.com.klok.pedidos.service.helper.EstoqueService;
 import br.com.klok.pedidos.service.helper.NotificacaoService;
 import br.com.klok.pedidos.service.helper.TotalService;
+import br.com.klok.pedidos.dto.request.PedidoRequestDTO;
+import br.com.klok.pedidos.dto.response.PedidoResponseDTO;
+import br.com.klok.pedidos.mapper.PedidoMapper;
+import br.com.klok.pedidos.dto.request.ItemPedidoRequestDTO;
 import br.com.klok.pedidos.model.Cliente;
 import br.com.klok.pedidos.model.Item;
+import br.com.klok.pedidos.model.ItemPedido;
 import br.com.klok.pedidos.model.Pedido;
 import br.com.klok.pedidos.repository.ClienteRepository;
 import br.com.klok.pedidos.repository.ItemRepository;
@@ -16,10 +19,12 @@ import br.com.klok.pedidos.repository.PedidoRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.time.LocalDate;
 
 @Service
 public class PedidoService {
+
     private final TotalService totalService;
     private final EstoqueService estoqueService;
     private final NotificacaoService notificacaoService;
@@ -65,55 +70,47 @@ public class PedidoService {
         notificarCliente(pedido.getCliente().getEmail(), emEstoque);
     }
 
-    public List<Pedido> listarTodos() {
-        return pedidoRepository.findAll();
-    }
+    public PedidoResponseDTO salvarPedido(PedidoRequestDTO dto) {
+        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-    public Pedido salvarPedido(Pedido pedido) {
-        // 1. Buscar cliente
-        Cliente cliente = clienteRepository.findById(pedido.getCliente().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
-
+        Pedido pedido = new Pedido();
         pedido.setCliente(cliente);
+        pedido.setDataEntrega(dto.getData());
+        List<ItemPedido> itensPedido = new ArrayList<>();
+        for (ItemPedidoRequestDTO itemDTO : dto.getItens()) {
+            Item item = itemRepository.findById(itemDTO.getItemId())
+                .orElseThrow(() -> new RuntimeException("Item não encontrado"));
 
-        // 2. Recarregar os itens com dados corretos
-        List<Item> itensAtualizados = new ArrayList<>();
-        for (Item item : pedido.getItens()) {
-            Item itemBanco = itemRepository.findById(item.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Item com id " + item.getId() + " não encontrado"));
-            itemBanco.setQuantidade(item.getQuantidade()); // mantém a quantidade enviada
-            itensAtualizados.add(itemBanco);
+            ItemPedido itemPedido = new ItemPedido();
+            itemPedido.setItem(item);
+            itemPedido.setQuantidade(itemDTO.getQuantidade());
+            itemPedido.setPedido(pedido); 
+
+            itensPedido.add(itemPedido);
         }
 
-        pedido.setItens(itensAtualizados);
+        pedido.setItens(itensPedido); 
 
-        // 3. Calcular total e total com desconto
-        double total = totalService.calcularTotal(pedido);
-        pedido.setTotal(total);
-
-        if (cliente.isVip()) {
-            pedido.setTotalComDesconto(totalService.aplicarDescontoVip(total));
-        } else {
-            pedido.setTotalComDesconto(total);
-        }
-
-        // 4. Definir data de entrega (ex: 7 dias após hoje)
-        pedido.setDataEntrega(LocalDate.now().plusDays(7));
-
-        // 5. Verificar estoque
-        boolean emEstoque = pedido.getItens().stream()
-                .allMatch(i -> i.getQuantidade() <= i.getEstoque());
-        pedido.setEmEstoque(emEstoque);
-
-        // 6. Salvar pedido
-        return pedidoRepository.save(pedido);
+        processarPedido(pedido); 
+        Pedido salvo = pedidoRepository.save(pedido);
+        return PedidoMapper.toDTO(salvo);
     }
 
-    public Pedido buscarPorId(@PathVariable Long id) {
-        return pedidoRepository.findById(id).orElse(null);
+    public List<PedidoResponseDTO> listarTodos() {
+        return pedidoRepository.findAll()
+                .stream()
+                .map(PedidoMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public void deletarPorId(@PathVariable Long id) {
+    public PedidoResponseDTO buscarPorId(Long id) {
+        return pedidoRepository.findById(id)
+                .map(PedidoMapper::toDTO)
+                .orElse(null);
+    }
+
+    public void deletarPorId(Long id) {
         pedidoRepository.deleteById(id);
     }
 
@@ -148,4 +145,3 @@ public class PedidoService {
         notificacaoService.enviar(email, mensagem);
     }
 }
-

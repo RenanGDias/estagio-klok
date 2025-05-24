@@ -30,6 +30,9 @@ public class Item {
         this.quantidade = quantidade;
         estoque = 100; //Para fins de facilitação
     }
+    public void setId(Long id) {
+        this.id = id;
+    }
     public Long getId() {
         return id;
     }
