@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TotalService {
     public double calcularTotal(Pedido pedido) {
-        return pedido.getItems().stream()
+        return pedido.getItens().stream()
                 .mapToDouble(item -> item.getPreco() * item.getQuantidade())
                 .sum();
     }

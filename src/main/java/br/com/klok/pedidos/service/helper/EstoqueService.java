@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EstoqueService {
     public boolean verificarDisponibilidade(Pedido pedido) {
-        return pedido.getItems().stream()
+        return pedido.getItens().stream()
                 .allMatch(item -> item.getQuantidade() <= item.getEstoque());
     }
 }

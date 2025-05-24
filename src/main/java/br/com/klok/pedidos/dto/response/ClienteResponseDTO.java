@@ -1,28 +1,16 @@
-package br.com.klok.pedidos.model;
+package br.com.klok.pedidos.dto.response;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class Cliente {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ClienteResponseDTO {
     private Long id;
     private String nome;
     private String email;
     private boolean vip;
     
-    public Cliente() {}
-
-    public Cliente(String nome, String email, boolean vip) {
-        this.nome = nome;
-        this.email = email;
-        this.vip = vip;
-    }
     public Long getId() {
         return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
     public String getNome() {
         return nome;
@@ -42,4 +30,6 @@ public class Cliente {
     public void setVip(boolean vip) {
         this.vip = vip;
     }
+    
 }
+

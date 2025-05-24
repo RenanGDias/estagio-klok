@@ -1,37 +1,17 @@
-package br.com.klok.pedidos.model;
+package br.com.klok.pedidos.dto.response;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ItemResponseDTO {
     private Long id;
     private String nome;
     private double preco;
     private int quantidade;
     private int estoque;
-
-    public Item(){}
-
-    public Item(String nome, double preco, int quantidade, int estoque) {
-        this.nome = nome;
-        this.preco = preco;
-        this.quantidade = quantidade;
-        this.estoque = estoque;
-    }
-
-    public Item(String nome, double preco, int quantidade) {
-        this.nome = nome;
-        this.preco = preco;
-        this.quantidade = quantidade;
-        estoque = 100; //Para fins de facilitação
-    }
+    
     public Long getId() {
         return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
     public String getNome() {
         return nome;
@@ -59,3 +39,4 @@ public class Item {
     }
     
 }
+

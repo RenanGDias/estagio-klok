@@ -28,8 +28,7 @@ src/
 ├── main/
 │   └── java/br/com/klok/pedidos/
 │       ├── controller/            # Controllers REST
-│       ├── dto/                   # (opcional) DTOs
-│       ├── mapper/                # (opcional) mapeadores
+│       ├── dto/                   # DTOs (Data Transfer Objects)
 │       ├── model/                 # Modelos: Pedido, Item, Cliente
 │       ├── service/               # Lógica principal (PedidoService)
 │       │   └── helper/            # Serviços auxiliares: estoque, total, notificação
@@ -83,7 +82,7 @@ Processa uma lista de pedidos e aplica as regras de negócio.
       "email": "maria@exemplo.com",
       "vip": true
     },
-    "items": [
+    "itens": [
       {
         "nome": "Produto A",
         "preco": 50.0,
@@ -104,7 +103,7 @@ Processa uma lista de pedidos e aplica as regras de negócio.
       "email": "joao@exemplo.com",
       "vip": false
     },
-    "items": [
+    "itens": [
       {
         "nome": "Produto C",
         "preco": 20.0,
@@ -145,7 +144,7 @@ public class PedidoService {
         for (Pedido pedido : pedidos) {
             double total = 0;
 
-            for (Item item : pedido.getItems()) {
+            for (Item item : pedido.getItens()) {
                 total += item.getPreco() * item.getQuantidade();
             }
 
@@ -158,7 +157,7 @@ public class PedidoService {
             pedido.setTotalComDesconto(total);
 
             boolean emEstoque = true;
-            for (Item item : pedido.getItems()) {
+            for (Item item : pedido.getItens()) {
                 if (item.getQuantidade() > item.getEstoque()) {
                     emEstoque = false;
                     break;
